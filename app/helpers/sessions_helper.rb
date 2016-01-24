@@ -37,6 +37,18 @@ module SessionsHelper
      	cookies.delete(:remember_token)
      end
 
+    def current_user?(user)
+        user == current_user
+    end
+
+    def redirect_back_or(default)  # Redirects to stored location (or to the default).
+        redirect_to(session[:forwarding_url] || default)
+        session.delete(:forwarding_url) #we delete session bc otherwise, subsequent login attempts would forward to the protected page until the user closed their browser
+    end
+
+    def store_location # Stores the URL trying to be accessed.
+        session[:forwarding_url] = request.url if request.get?
+    end
 
 end
 
