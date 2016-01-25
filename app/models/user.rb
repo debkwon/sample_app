@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  has_many :microposts, dependent: :destroy
+
 	attr_accessor :remember_token, :activation_token, :reset_token
   
 	before_save :downcase_email
@@ -57,6 +59,17 @@ class User < ActiveRecord::Base
 
   def password_reset_expired?
     reset_sent_at < 2.hours.ago #resent_sent_at earlier than two hours ago, returns true of so
+  end
+
+  def feed
+    Micropost.where("user_id = ?", id)
+    #The question mark ensures that id is properly escaped 
+    # before being included in the underlying SQL query, thereby 
+    # avoiding a serious security hole called SQL injection. The id 
+    # attribute here is just an integer (i.e., self.id, the unique ID 
+    # of the user), so there is no danger of SQL injection in this case, 
+    # but always escaping variables injected into SQL statements is a good 
+    # habit to cultivate.
   end
    ####################################
    private
